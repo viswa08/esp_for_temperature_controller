@@ -51,124 +51,21 @@ void setup() {
 }
 void loop() 
 {
-    delay(500);
-    ReadIncomingData();
-    Firebase.pushFloat("sensor1/temperature",CurrentTemperature );
-    // handle error
-  if (Firebase.failed()) {
-      Serial.print("setting /number failed:");
-      Serial.println(Firebase.error());  
-      return;
-     
-      delay(2000);
-  }
-
-      Firebase.pushFloat("sensor1/voltage",CurrentVoltage );
-    // handle error
-  if (Firebase.failed()) {
-      Serial.print("setting /number failed:");
-      Serial.println(Firebase.error());  
-      return;
-     
-      delay(2000);
-  }
-
-        Firebase.pushFloat("sensor1/Amps",AcCurrent );
-    // handle error
-  if (Firebase.failed()) {
-      Serial.print("setting /number failed:");
-      Serial.println(Firebase.error());  
-      return;
-     
-      delay(2000);
-  }
-
-      Firebase.setFloat("sensor1/EEprom min temperature",EEPROMMinValue);
-          // handle error
-  if (Firebase.failed()) {
-      Serial.print("setting /number failed:");
-      Serial.println(Firebase.error());  
-      return;
-     
-      delay(2000);
-  }
-
-        Firebase.setFloat("sensor1/EEprom max temperature",EEPROMMaxValue);
-          // handle error
-  if (Firebase.failed()) {
-      Serial.print("setting /number failed:");
-      Serial.println(Firebase.error());  
-      return;
-     
-      delay(2000);
-  }
-  
-  CLOUDMinValue = Firebase.getFloat("Sensor1/minimum temperature");
-  CLOUDMaxValue = Firebase.getFloat("Sensor1/maximum temperature");
-
-  if (CLOUDMinValue !=0) {
-                  T1 = "MINTEMP:";
-                  T1+=CLOUDMinValue;
-                  T1.toCharArray(SendTheData,300);
-                  Serial.write(SendTheData);
-                  delay(100);
-             }
-           if (CLOUDMaxValue !=0) {
-                  T1 = "MAXTEMP:";
-                  T1+=CLOUDMaxValue;
-                  T1.toCharArray(SendTheData,300);
-                  Serial.write(SendTheData);
-                  delay(100);
-           }
-           
-}
-
-
- void ReadIncomingData() {
-  delay(150);
-      ReadTheData ="";
+    ReadTheData ="";
        while(Serial.available()){
             char b =  Serial.read();
             ReadTheData += b; //Wire.read();
+            Serial.print(ReadTheData);
        }
 
           if (ReadTheData.indexOf("TEMPA:") >=0) {
                          T1 = ReadTheData.substring(6,8);
                          T2 = ReadTheData.substring(8,10);
                          CurrentTemperature = (T1.toFloat()*100 + T2.toFloat())/100;
-                         Serial.print("Temperature = ");Serial.println(CurrentTemperature);
-                       
+                         Serial.println(CurrentTemperature);
           }
-           else if (ReadTheData.indexOf("VOLTS:") >=0) {
-                         T1 = ReadTheData.substring(6,9);
-                         CurrentVoltage = T1.toFloat();
-                        // Serial.print("voltage = ");Serial.println(CurrentVoltage);
-         
-          }
-          else if (ReadTheData.indexOf("AMPS :") >=0) {
-                         T1 = ReadTheData.substring(6,9);
-                         AcCurrent = T1.toFloat();
-                        // Serial.print("Current = ");Serial.println(AcCurrent);
-                        
-          }
-          else if (ReadTheData.indexOf("MIN-EEPROM:") >=0) {
-                  T1 = ReadTheData.substring(11,13);
-                  T2 = ReadTheData.substring(13,15);
-                  EEPROMMinValue = (T1.toFloat()*100 + T2.toFloat())/100;
-                  //Serial.print("EE min = ");Serial.println(EEPROMMinValue);
-                  
-          }
-          else if (ReadTheData.indexOf("MAX-EEPROM:") >=0) {
-                  T1 = ReadTheData.substring(11,13);
-                  T2 = ReadTheData.substring(13,15);
-                   EEPROMMaxValue = (T1.toFloat()*100 + T2.toFloat())/100;
-                   //Serial.print("EE max = ");Serial.println(EEPROMMaxValue);
-          }
-                       /*if(CurrentTemperature > 27)
-                          {
-                          thing.call_endpoint("temp_point");
-                          }*/
+           
 }
 
 
-
+ 

@@ -53,24 +53,44 @@ void loop()
 {
   
     ReadIncomingData();
-    delay(1000);
+    delay(750);
       if(CurrentTemperature > 4.00)
       {
-        Serial.print("temperature = ");Serial.println(CurrentTemperature); 
+        //Serial.print("temperature = ");Serial.println(CurrentTemperature); 
         Firebase.pushFloat("sensor1/temperature",CurrentTemperature);
       }
       else{
         Serial.println("garbage value");
       }
       if(CurrentVoltage>4.00){
-        Serial.print("voltage = ");Serial.println(CurrentVoltage);
+        //Serial.print("voltage = ");Serial.println(CurrentVoltage);
         Firebase.pushFloat("sensor1/voltage",CurrentVoltage);
       }
       else{
-        Serial.println("voltage garbage");
+        //Serial.println("voltage garbage");
       }
-    
+      Firebase.pushFloat("sensor1/Amps",AcCurrent);
       
+      //Get Minimum and maximum values from cloud
+      CLOUDMinValue = Firebase.getFloat("sensor1/minimum temperature");
+      CLOUDMaxValue = Firebase.getFloat("sensor1/maximum temperature");   
+      //Serial.print("Min value = ");Serial.println(CLOUDMinValue);
+      delay(100);
+      if (CLOUDMinValue !=0.00) {
+                  //Serial.println("setting minimum value");
+                  T1 = "MINTEMP:";
+                  T1+=CLOUDMinValue;
+                  T1.toCharArray(SendTheData,300);
+                  Serial.write(SendTheData);
+                  delay(100);
+             }
+             if (CLOUDMaxValue !=0) {
+                  T1 = "MAXTEMP:";
+                  T1+=CLOUDMaxValue;
+                  T1.toCharArray(SendTheData,300);
+                  Serial.write(SendTheData);
+                  delay(100);
+           }
 }
 
 void ReadIncomingData() {

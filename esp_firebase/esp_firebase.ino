@@ -49,8 +49,8 @@ void setup() {
    
   Firebase.begin(FIREBASE_HOST, FIREBASE_AUTH);
 
-  CLOUDMinValue = Firebase.setFloat("sensor1/minimum temperature", 0);
-  CLOUDMinValue = Firebase.setFloat("sensor1/maximum temperature", 0);
+  //CLOUDMinValue = Firebase.setFloat("sensor1/minimum temperature", 0);
+  //CLOUDMaxValue = Firebase.setFloat("sensor1/maximum temperature", 0);
 }
 void loop() 
 {

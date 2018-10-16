@@ -1,7 +1,7 @@
 #include <ESP8266WiFi.h>
 
 #include <OneWire.h>
-#include <DallasTemperature.h>
+
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>  
@@ -73,7 +73,7 @@ void loop()
                   T3 = "\n";
                   T1 = T1+T2+T3;
                   T1.toCharArray(SendTheData,300);
-                  Serial.write(SendTheData);
+                  Serial.print(SendTheData);
                   //Serial.print("MINTEMP= ");Serial.println(SendTheData);
                   delay(100);
              }
@@ -84,7 +84,7 @@ void loop()
                   T3 = "\n";
                   T1 = T1+T2+T3;
                   T1.toCharArray(SendTheData,300);
-                  Serial.write(SendTheData);
+                  Serial.print(SendTheData);
                   delay(100);
            }
 //    
@@ -138,7 +138,7 @@ void ReadIncomingData() {
                        //Serial.print("temperature");Serial.println(CurrentTemperature);
                        if(CurrentTemperature > 10.00)
                        {
-                        Firebase.pushFloat("sensor2/temperature",CurrentTemperature);
+                        Firebase.setFloat("sensor2/temperature",CurrentTemperature);
                        }
           }
            else if (ReadTheData.indexOf("VOLTS:") >=0) {
@@ -149,14 +149,14 @@ void ReadIncomingData() {
                          BugTemperature = (T1_bug.toFloat()*100 + T2_bug.toFloat())/100;
                          if(CurrentVoltage > 10.00)
                          {
-                          Firebase.pushFloat("sensor2/voltage",CurrentVoltage);
+                          Firebase.setFloat("sensor2/voltage",CurrentVoltage);
                          }
                          
           }
           else if (ReadTheData.indexOf("AMPS :") >=0) {
                          T1 = ReadTheData.substring(6,9);
                          AcCurrent = T1.toFloat();
-                         Firebase.pushFloat("sensor2/Amps",AcCurrent);
+                         Firebase.setFloat("sensor2/Amps",AcCurrent);
                          
           }
           else if (ReadTheData.indexOf("MIN-EEPROM:") >=0) {

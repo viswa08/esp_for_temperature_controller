@@ -1,7 +1,5 @@
 #include <ESP8266WiFi.h>
 
-#include <OneWire.h>
-
 #include <DNSServer.h>
 #include <ESP8266WebServer.h>
 #include <WiFiManager.h>  
@@ -24,7 +22,7 @@ int test=25;
 float val;
 float MIN,MAX;
 float EEPROMMinValue,EEPROMMaxValue;
-float CLOUDMinValue, CLOUDMaxValue, lastMin, lastMax;
+float CLOUDMinValue, CLOUDMaxValue;
 float Value;
 int RData;
 
@@ -61,8 +59,16 @@ void loop()
     ReadIncomingData();
     //Get Minimum and maximum values from cloud
       CLOUDMinValue = Firebase.getFloat("sensor1/minimum temperature");
+      if(Firebase.failed()){
+        Serial.println("cloud min failed");
+        delay(1000);
+      }
       //Serial.println(CLOUDMinValue);
-      CLOUDMaxValue = Firebase.getFloat("sensor1/maximum temperature");   
+      CLOUDMaxValue = Firebase.getFloat("sensor1/maximum temperature"); 
+      if(Firebase.failed()){
+        Serial.println("cloud max failed");
+        
+      }  
       //Serial.print("Max value = ");Serial.println(CLOUDMaxValue);
       delay(200);
       if (CLOUDMinValue !=0) {
@@ -70,26 +76,25 @@ void loop()
                   
                   T1 = "MINTEMP:";
                   //T2 = (int)CLOUDMinValue*100;
-                  T4 = "\n";                  
+                  T4 = "\n";
                   T2 = String(CLOUDMinValue).substring(0,2);                  
-                  T3 = String(CLOUDMinValue).substring(3,5);                  
+                  T3 = String(CLOUDMinValue).substring(3,5);
                   T1 = T1+T2+T3+T4;
                   T1.toCharArray(SendTheData,300);
                   Serial.print(SendTheData);
                   //Serial.print("MINTEMP= ");Serial.println(SendTheData);
-                  
                   delay(100);
              }
              if (CLOUDMaxValue !=0) {
               
                   T1 = "MAXTEMP:";
                   //T2 = (int)CLOUDMaxValue*100;
+                  T3 = "\n";
                   T2 = String(CLOUDMaxValue).substring(0,2); 
-                  T3 = String(CLOUDMaxValue).substring(3,5); 
-                  T4 = "\n";
+                  T3 = String(CLOUDMaxValue).substring(3,5);
                   T1 = T1+T2+T3+T4;
                   T1.toCharArray(SendTheData,300);
-                  Serial.print(SendTheData);                  
+                  Serial.print(SendTheData);
                   delay(100);
            }
 //    
@@ -148,14 +153,17 @@ void ReadIncomingData() {
                         if(Firebase.failed()){
                           Serial.println("Temperature upload failed");
                         }
+                        else{
+                          Serial.print("Temperature = ");Serial.println(CurrentTemperature);
+                        }
                        }
                        break;
                        
             case 'A':
                       T1 = ReadTheData.substring(6,9);
                       AcCurrent = T1.toFloat();
-                      T1+="A";   
-                      Serial.print("Current  = "); Serial.println(T1);
+                      //T1+="A";   
+                      //Serial.print("Current  = "); Serial.println(T1);
                       Firebase.setFloat("sensor1/Amps",AcCurrent);
                       if(Firebase.failed()){
                           Serial.println("Amps upload failed");
@@ -173,8 +181,22 @@ void ReadIncomingData() {
                         }
                       break;
 
-                        
-          }       
+            case 'M':
+                      if(ReadTheData.indexOf("MIN-EEPROM:") >=0){
+                        T1 = ReadTheData.substring(11,13);
+                        T2 = ReadTheData.substring(13,15);
+                        EEPROMMinValue = (T1.toFloat()*100 + T2.toFloat())/100;
+                        Firebase.setFloat("sensor1/EEprom min temperature",EEPROMMinValue);
+                      }
+
+                      if (ReadTheData.indexOf("MAX-EEPROM:") >=0) {
+                      T1 = ReadTheData.substring(11,13);
+                      T2 = ReadTheData.substring(13,15);
+                      EEPROMMaxValue = (T1.toFloat()*100 + T2.toFloat())/100;
+                      Firebase.setFloat("sensor1/EEprom max temperature",EEPROMMaxValue);
+                      }
+                                              
+          }     
 }
 
 

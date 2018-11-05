@@ -24,11 +24,11 @@ int test=25;
 float val;
 float MIN,MAX;
 float EEPROMMinValue,EEPROMMaxValue;
-float CLOUDMinValue, CLOUDMaxValue, lastMin, lastMax;
+float CLOUDMinValue, CLOUDMaxValue;
 float Value;
 int RData;
 
-String ReadTheData,T1,T2,T1_bug,T2_bug,T3,T4;
+String ReadTheData,T1,T2,T1_bug,T2_bug,T3;
 char SendTheData[300];
 
 float CurrentMin, CurrentMax; 
@@ -60,36 +60,31 @@ void loop()
     delay(750);
     ReadIncomingData();
     //Get Minimum and maximum values from cloud
-      CLOUDMinValue = Firebase.getFloat("sensor1/minimum temperature");
+      CLOUDMinValue = Firebase.getInt("sensor1/minimum temperature");
       //Serial.println(CLOUDMinValue);
-      CLOUDMaxValue = Firebase.getFloat("sensor1/maximum temperature");   
+      CLOUDMaxValue = Firebase.getInt("sensor1/maximum temperature");   
       //Serial.print("Max value = ");Serial.println(CLOUDMaxValue);
       delay(200);
       if (CLOUDMinValue !=0) {
                   //Serial.println("setting minimum value");
                   
                   T1 = "MINTEMP:";
-                  //T2 = (int)CLOUDMinValue*100;
-                  T4 = "\n";                  
-                  T2 = String(CLOUDMinValue).substring(0,2);                  
-                  T3 = String(CLOUDMinValue).substring(3,5);                  
-                  T1 = T1+T2+T3+T4;
+                  T2 = (int)CLOUDMinValue*100;
+                  T3 = "\n";
+                  T1 = T1+T2+T3;
                   T1.toCharArray(SendTheData,300);
                   Serial.print(SendTheData);
                   //Serial.print("MINTEMP= ");Serial.println(SendTheData);
-                  
                   delay(100);
              }
              if (CLOUDMaxValue !=0) {
               
                   T1 = "MAXTEMP:";
-                  //T2 = (int)CLOUDMaxValue*100;
-                  T2 = String(CLOUDMaxValue).substring(0,2); 
-                  T3 = String(CLOUDMaxValue).substring(3,5); 
-                  T4 = "\n";
-                  T1 = T1+T2+T3+T4;
+                  T2 = (int)CLOUDMaxValue*100;
+                  T3 = "\n";
+                  T1 = T1+T2+T3;
                   T1.toCharArray(SendTheData,300);
-                  Serial.print(SendTheData);                  
+                  Serial.print(SendTheData);
                   delay(100);
            }
 //    
@@ -154,8 +149,8 @@ void ReadIncomingData() {
             case 'A':
                       T1 = ReadTheData.substring(6,9);
                       AcCurrent = T1.toFloat();
-                      T1+="A";   
-                      Serial.print("Current  = "); Serial.println(T1);
+                      //T1+="A";   
+                      //Serial.print("Current  = "); Serial.println(T1);
                       Firebase.setFloat("sensor1/Amps",AcCurrent);
                       if(Firebase.failed()){
                           Serial.println("Amps upload failed");

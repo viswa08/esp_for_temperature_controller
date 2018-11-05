@@ -24,7 +24,6 @@ int test=25;
 float val;
 float MIN,MAX;
 float EEPROMMinValue,EEPROMMaxValue;
-float CLOUDMinValue, CLOUDMaxValue;
 float CLOUDMinValue, CLOUDMaxValue, lastMin, lastMax;
 float Value;
 int RData;
@@ -63,6 +62,7 @@ void loop()
     //Get Minimum and maximum values from cloud
       CLOUDMinValue = Firebase.getFloat("sensor1/minimum temperature");
       //Serial.println(CLOUDMinValue);
+      CLOUDMaxValue = Firebase.getFloat("sensor1/maximum temperature");   
       //Serial.print("Max value = ");Serial.println(CLOUDMaxValue);
       delay(200);
       if (CLOUDMinValue !=0) {
@@ -70,10 +70,8 @@ void loop()
                   
                   T1 = "MINTEMP:";
                   //T2 = (int)CLOUDMinValue*100;
-                  T4 = "\n";
                   T4 = "\n";                  
                   T2 = String(CLOUDMinValue).substring(0,2);                  
-                  T3 = String(CLOUDMinValue).substring(3,5);
                   T3 = String(CLOUDMinValue).substring(3,5);                  
                   T1 = T1+T2+T3+T4;
                   T1.toCharArray(SendTheData,300);

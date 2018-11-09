@@ -17,7 +17,7 @@
 //#define WIFI_PASSWORD "sree2930"
 
 float reading;
-float CurrentTemperature, CurrentVoltage, AcCurrent,BugTemperature;
+float CurrentTemperature, CurrentVoltage, AcCurrent,BugTemperature,kwh;
 int test=25;
 float val;
 float MIN,MAX;
@@ -58,7 +58,7 @@ void setup() {
 void loop() 
 {
   
-    delay(750);
+    delay(100);
     //ReadIncomingData();
     //Get Minimum and maximum values from cloud
       CLOUDMinValue = Firebase.getFloat("sensor1/minimum temperature");
@@ -77,7 +77,7 @@ void loop()
       //Serial.print("Max value = ");Serial.println(CLOUDMaxValue);
       delay(200);
 
-      if (CLOUDMinValue !=0) {
+      if (CLOUDMinValue >0) {
                   //Serial.println("setting minimum value");
                   
                   T1 = "MINTEMP:";
@@ -87,11 +87,11 @@ void loop()
                   T3 = String(CLOUDMinValue).substring(3,5);
                   T1 = T1+T2+T3+T4;
                   T1.toCharArray(SendTheData,300);
-                  Serial.print(SendTheData);
+                  Serial.write(SendTheData);
                   //Serial.print("MINTEMP= ");Serial.println(SendTheData);
                   delay(100);
              }
-             if (CLOUDMaxValue !=0) {
+             if (CLOUDMaxValue >0) {
               
                   T1 = "XAMTEMP:";
                   //T2 = (int)CLOUDMaxValue*100;
@@ -100,7 +100,7 @@ void loop()
                   T3 = String(CLOUDMaxValue).substring(3,5);
                   T1 = T1+T2+T3+T4;
                   T1.toCharArray(SendTheData,300);
-                  Serial.print(SendTheData);
+                  Serial.write(SendTheData);
                   delay(100);
            }
 //    
@@ -171,6 +171,24 @@ void ReadIncomingData() {
                         }
                        }
                        break;
+
+             case 'O':
+
+                    if (ReadTheData.indexOf(":ON") >=0) {
+                      Serial.println("On");
+                      Firebase.setBool("sensor1/Status",true);
+                      if(Firebase.failed()){
+                          Serial.println("status on failed");
+                        }
+                    }
+                    else if(ReadTheData.indexOf(":OFF") >=0){
+                      Serial.println("Off");
+                      Firebase.setBool("sensor1/Status",false);
+                      if(Firebase.failed()){
+                          Serial.println("status on failed");
+                        }
+                    }
+                    break;
                        
             case 'A':
                       T1 = ReadTheData.substring(6,9);
@@ -195,22 +213,36 @@ void ReadIncomingData() {
                       break;
 
             case 'M':
-                      if(ReadTheData.indexOf("MIN-EEPROM:") >0){
+                      
                         T1 = ReadTheData.substring(11,13);
                         T2 = ReadTheData.substring(13,15);
                         EEPROMMinValue = (T1.toFloat()*100 + T2.toFloat())/100;
                         //Serial.print("ee-mini");Serial.println(EEPROMMinValue);
-                        Firebase.setFloat("sensor1/EEprom max temperature",EEPROMMinValue);
-                      }
+                        Firebase.setFloat("sensor1/EEprom min temperature",EEPROMMinValue);
+                      
+                      break;
 
-                      else if (ReadTheData.indexOf("MAX-EEPROM:") >0) {
+            case 'X':
+                      
                       T1 = ReadTheData.substring(11,13);
                       T2 = ReadTheData.substring(13,15);
                       EEPROMMaxValue = (T1.toFloat()*100 + T2.toFloat())/100;
                       //Serial.print("ee-maxi");Serial.println(EEPROMMaxValue);
-                      Firebase.setFloat("sensor1/EEprom min temperature",EEPROMMaxValue);
-                      }
+                      Firebase.setFloat("sensor1/EEprom max temperature",EEPROMMaxValue);
+                      
                       break;
+
+            case 'K':
+
+                    T1 = ReadTheData.substring(5);
+                    kwh = T1.toFloat();
+                    Serial.print("KWH");Serial.println(kwh);
+                    if(kwh >0){                      
+                      Firebase.setFloat("sensor1/KWH",kwh);     
+                    }
+                    break;
+
+           
                                               
           }     
 }
